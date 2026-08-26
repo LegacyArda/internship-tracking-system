@@ -1,0 +1,206 @@
+﻿@model IEnumerable<StajTakipSistemi.Models.InternshipReport>
+
+@{
+    ViewData["Title"] = "Staj Raporları";
+}
+
+@if (User.IsInRole("Akademisyen") || User.IsInRole("Yönetici"))
+{
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h2 class="fw-bold text-primary">📑 Staj Raporları Yönetim Paneli</h2>
+        <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">Akademisyen Yetkisi</span>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body bg-light rounded shadow-sm">
+            <form asp-action="Index" method="get">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"
+                                   class="form-control form-control-lg border-start-0"
+                                   placeholder="Öğrenci adı veya konu başlığı ara..." />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="statusFilter" class="form-select form-select-lg">
+                            <option value="">🔍 Tüm Durumlar</option>
+                            <option value="Approved" selected="@(ViewData["StatusFilter"]?.ToString() == "Approved")">✅ Sadece Onaylananlar</option>
+                            <option value="Pending" selected="@(ViewData["StatusFilter"]?.ToString() == "Pending")">⏳ Sadece Onay Bekleyenler</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">Ara</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded-4">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-dark text-white">
+                <tr>
+                    <th class="py-3 ps-4">Öğrenci</th>
+                    <th class="py-3">Tarih</th>
+                    <th class="py-3">Konu Başlığı</th>
+                    <th class="py-3 text-center">Durum</th>
+                    <th class="py-3 text-center">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center me-2" style="width: 35px; height: 35px; font-size: 0.8em;">
+                                    @(string.IsNullOrEmpty(item.Student?.FirstName) ? "Ö" : item.Student.FirstName[0].ToString())@(string.IsNullOrEmpty(item.Student?.LastName) ? "G" : item.Student.LastName[0].ToString())
+                                </div>
+                                <span class="fw-bold">@item.Student?.FirstName @item.Student?.LastName</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">@item.Date.ToString("dd.MM.yyyy")</td>
+                        <td>@item.Title</td>
+                        <td class="text-center">
+                            @if (item.IsApproved)
+                            {
+                                <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.85em;">Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.85em;">Bekliyor</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info shadow-sm">İncele</a>
+                                @if (!string.IsNullOrEmpty(item.FilePath))
+                                {
+                                    <a href="~/uploads/@item.FilePath" target="_blank" class="btn btn-sm btn-outline-dark shadow-sm">Ekli Dosya</a>
+                                }
+                                <a asp-action="DownloadPdf" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger shadow-sm">PDF</a>
+                            </div>
+                            <form asp-action="ToggleApprove" asp-route-id="@item.Id" method="post" class="d-inline ms-1">
+                                @if (item.IsApproved)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary mt-1 shadow-sm" style="min-width: 100px;">Onayı Kaldır</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-sm btn-success mt-1 shadow-sm" style="min-width: 100px;">Hızlı Onay</button>
+                                }
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="row align-items-center mb-4 mt-3">
+        <div class="col-md-8">
+            <h2 class="fw-bold text-dark">🚀 Benim Staj Çalışma Alanım</h2>
+            <p class="text-muted mb-0">Yüklediğin raporları takip edebilir, hoca geri bildirimlerini inceleyebilirsin.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a asp-action="Create" class="btn btn-success btn-lg fw-bold shadow-sm rounded-pill px-4">
+                <i class="bi bi-cloud-arrow-up-fill"></i> + Yeni Rapor Gönder
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+                    <div style="height: 5px;" class="@(item.IsApproved ? "bg-success" : "bg-warning")"></div>
+                    <div class="card-body p-4 d-flex flex-column h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom text-muted" style="font-size: 0.75rem;">
+                            <div class="text-center text-primary fw-bold">
+                                <i class="bi bi-cloud-check-fill fs-5 d-block mb-1"></i> Yüklendi
+                            </div>
+                            <div class="flex-grow-1 border-top mx-2 mt-2 @(item.Score.HasValue || item.IsApproved ? "border-primary border-2" : "")"></div>
+                            <div class="text-center @(item.Score.HasValue || item.IsApproved ? "text-primary fw-bold" : "")">
+                                <i class="bi bi-search fs-5 d-block mb-1"></i> İnceleniyor
+                            </div>
+                            <div class="flex-grow-1 border-top mx-2 mt-2 @(item.IsApproved ? "border-success border-2" : "")"></div>
+                            <div class="text-center @(item.IsApproved ? "text-success fw-bold" : "")">
+                                <i class="bi bi-check-circle-fill fs-5 d-block mb-1"></i> Onaylandı
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="text-muted small fw-bold"><i class="bi bi-calendar3"></i> @item.Date.ToString("dd MMM yyyy")</span>
+                        </div>
+                        <h5 class="card-title fw-bold text-dark mb-2">@item.Title</h5>
+                        <p class="card-text text-muted small mb-3">
+                            @(item.Content.Length > 80 ? item.Content.Substring(0, 80) + "..." : item.Content)
+                        </p>
+                        @if (!string.IsNullOrEmpty(item.FilePath))
+                        {
+                            <a href="~/uploads/@item.FilePath" target="_blank" class="btn btn-sm btn-light border mb-3 rounded-3 text-start w-100 text-truncate shadow-sm" title="@item.FilePath">
+                                <i class="bi bi-paperclip text-primary fs-6"></i>
+                                <span class="text-dark small ms-1 fw-bold">Ekli Dosya:</span>
+                                <span class="text-muted small">@item.FilePath</span>
+                            </a>
+                        }
+                        <div class="mt-auto">
+                            <div class="bg-light p-2 rounded-3 mb-2 text-center shadow-none">
+                                @if (item.Score.HasValue)
+                                {
+                                    <span class="small text-muted">Rapor Puanı:</span>
+                                    <span class="fw-bold text-primary ms-1" style="font-size: 1.1rem;">@item.Score / 100</span>
+                                }
+                                else
+                                {
+                                    <span class="small text-muted italic"><i class="bi bi-hourglass-split"></i> Henüz puanlanmadı</span>
+                                }
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.Feedback))
+                            {
+                                <div class="border-start border-primary border-3 ps-2 py-1 mb-3 bg-primary-subtle rounded-end text-dark small">
+                                    <strong>Hoca Notu:</strong> @item.Feedback
+                                </div>
+                            }
+                            <div class="d-flex gap-2 pt-2 border-top border-light">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-light text-dark fw-bold rounded-pill flex-grow-1">
+                                    <i class="bi bi-eye"></i> İncele
+                                </a>
+                                @if (!item.IsApproved)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary fw-bold rounded-pill flex-grow-1">
+                                        <i class="bi bi-pencil-square"></i> Düzenle
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-secondary fw-bold rounded-pill flex-grow-1" disabled title="Onaylı rapor düzenlenemez.">
+                                        <i class="bi bi-lock"></i> Kilitli
+                                    </button>
+                                }
+                                <a asp-action="DownloadPdf" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-circle px-2" title="Resmi PDF İndir">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <div class="p-5 bg-white rounded-4 shadow-sm border-0">
+                    <i class="bi bi-folder-plus text-muted mb-3" style="font-size: 3.5rem;"></i>
+                    <h4 class="fw-bold text-dark">Henüz Rapor Göndermemişsin</h4>
+                    <p class="text-muted">Staj günlüklerini veya raporlarını sağ üstteki butona tıklayarak sisteme yüklemeye başlayabilirsin.</p>
+                    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 mt-2 fw-bold shadow-sm">İlk Raporu Oluştur</a>
+                </div>
+            </div>
+        }
+    </div>
+}

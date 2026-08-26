@@ -1,0 +1,54 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-5">
+                <h2 class="text-center fw-bold text-primary mb-4">Sisteme Giriş Yap</h2>
+                <hr />
+                <form id="account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="isim@ornek.com" />
+                        <label asp-for="Input.Email">E-posta Adresi</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Şifre" />
+                        <label asp-for="Input.Password">Şifre</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="checkbox mb-3 ms-1">
+                        <label asp-for="Input.RememberMe" class="form-label text-muted small">
+                            <input class="form-check-input" asp-for="Input.RememberMe" />
+                            Beni Hatırla
+                        </label>
+                    </div>
+                    
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary fw-bold rounded-pill shadow-sm mb-3">Giriş Yap</button>
+                    
+                    <div class="text-center mt-3">
+                        <p class="mb-1">
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none small text-muted">Şifrenizi mi unuttunuz?</a>
+                        </p>
+                        <p class="mb-0">
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none small fw-bold text-primary">Yeni bir hesap oluşturun</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

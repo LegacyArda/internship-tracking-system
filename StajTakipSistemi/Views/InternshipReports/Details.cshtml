@@ -1,0 +1,77 @@
+﻿@model StajTakipSistemi.Models.InternshipReport
+
+@{
+    ViewData["Title"] = "Staj Raporu Detayı";
+}
+
+<div class="container mt-4">
+    
+    @if (Model.Score.HasValue || !string.IsNullOrEmpty(Model.Feedback))
+    {
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="bg-primary text-white px-4 py-2 fw-bold">🎓 Akademisyen Değerlendirmesi</div>
+            <div class="card-body p-4 bg-primary-subtle text-dark">
+                <div class="row align-items-center text-center text-md-start">
+                    <div class="col-md-3">
+                        <div class="display-5 fw-bold text-primary">@Model.Score<span class="fs-4">/100</span></div>
+                        <small class="text-muted fw-bold">Değerlendirme Puanı</small>
+                    </div>
+                    <div class="col-md-9 border-start border-primary ps-4">
+                        <p class="mb-0 fst-italic"><strong>Hocanın Notu:</strong> @Model.Feedback</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card p-3 my-3 border-primary shadow-sm rounded-4">
+        <h5>Hocanın Değerlendirmesi</h5>
+        <p><strong>Puan:</strong> @(Model.Score ?? 0) / 100</p>
+        <p><strong>Açıklama:</strong> @(Model.Feedback ?? "Henüz not girilmedi.")</p>
+    </div>
+
+    <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-white py-3">
+            <h4 class="mb-0">Rapor Detayları: @Model.Title</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Date)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Date)</dd>
+
+                <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Title)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Title)</dd>
+
+                <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.Content)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Content)</dd>
+
+                <dt class="col-sm-3 text-muted">@Html.DisplayNameFor(model => model.IsApproved)</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsApproved)
+                    {
+                        <span class="badge bg-success">Onaylandı</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Beklemede</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 text-muted">Öğrenci ID</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Student.Id)</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-light p-3">
+            @* BURASI DÜZELTİLDİ: Yetki ve Onay Kontrolü Eklendi *@
+            @if (User.IsInRole("Akademisyen") || User.IsInRole("Yönetici") || !Model.IsApproved)
+            {
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Düzenle</a>
+            }
+            else
+            {
+                <button class="btn btn-secondary" disabled title="Onaylanmış rapor düzenlenemez.">Düzenle</button>
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+        </div>
+    </div>
+</div>

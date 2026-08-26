@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa - Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="text-primary fw-bold mb-4">👋 Hoş Geldiniz, @User.Identity?.Name</h2>
+
+    @if (User.IsInRole("Akademisyen") || User.IsInRole("Yönetici"))
+    {
+        @* HOCALAR İÇİN İSTATİSTİK SAYILARI *@
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-primary shadow rounded-4 border-0 h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <h1 class="display-4 fw-bold">@ViewBag.TotalStudents</h1>
+                        <h5 class="mb-0">Kayıtlı Öğrenci</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-secondary shadow rounded-4 border-0 h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <h1 class="display-4 fw-bold">@ViewBag.TotalReports</h1>
+                        <h5 class="mb-0">Toplam Rapor</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-white bg-success shadow rounded-4 border-0 h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <h1 class="display-4 fw-bold">@ViewBag.ApprovedReports</h1>
+                        <h5 class="mb-0">Onaylanan</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card text-dark bg-warning shadow rounded-4 border-0 h-100">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <h1 class="display-4 fw-bold">@ViewBag.PendingReports</h1>
+                        <h5 class="mb-0">Bekleyen</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* ÖĞRENCİLER İÇİN YÖNLENDİRME KARTLARI (SAYILAR YOK) *@
+        <div class="row mt-3">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-4 text-center h-100 p-4 transition-hover">
+                    <i class="bi bi-cloud-arrow-up text-success mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Yeni Rapor Gönder</h5>
+                    <p class="text-muted small mb-4">Staj günlüklerini veya dosyalarını sisteme yükleyerek hocanın onayına sun.</p>
+                    <a href="/InternshipReports/Create" class="btn btn-success rounded-pill mt-auto fw-bold shadow-sm">Rapor Oluştur</a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-4 text-center h-100 p-4 transition-hover">
+                    <i class="bi bi-folder2-open text-primary mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Çalışma Alanım</h5>
+                    <p class="text-muted small mb-4">Önceki raporlarının onay durumunu ve hocanın verdiği notları takip et.</p>
+                    <a href="/InternshipReports" class="btn btn-primary rounded-pill mt-auto fw-bold shadow-sm">Raporlarıma Git</a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-4 text-center h-100 p-4 bg-light transition-hover">
+                    <i class="bi bi-person-badge text-secondary mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="fw-bold text-dark">Profil Bilgilerim</h5>
+                    <p class="text-muted small mb-4">Sistemde kayıtlı olan bölüm, okul numarası ve kişisel bilgilerini görüntüle.</p>
+                    <a href="/Profile" class="btn btn-outline-dark rounded-pill mt-auto fw-bold shadow-sm" target="_blank">Profilimi Gör</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

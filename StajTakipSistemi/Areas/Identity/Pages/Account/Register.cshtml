@@ -1,0 +1,109 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-5">
+                <h2 class="text-center fw-bold text-primary mb-4">Sisteme Kayıt Ol</h2>
+                <hr />
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    
+                    @* Bütün hataları gösteren kırmızı kutu *@
+                    <div asp-validation-summary="All" class="text-danger fw-bold mb-3" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="Input.Role" class="form-select" id="roleSelector" aria-required="true">
+                            <option value="">-- Rol Seçiniz --</option>
+                            <option value="Öğrenci">Öğrenci</option>
+                            <option value="Akademisyen">Akademisyen / Öğretmen</option>
+                            
+                        </select>
+                        <label asp-for="Input.Role">Kullanıcı Rolü</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.FirstName" class="form-control" aria-required="true" placeholder="Ad" />
+                                <label asp-for="Input.FirstName">Ad</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.LastName" class="form-control" aria-required="true" placeholder="Soyad" />
+                                <label asp-for="Input.LastName">Soyad</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="studentFields" style="display: none;" class="bg-light p-3 rounded-3 mb-3 border">
+                        <h6 class="text-muted fw-bold mb-3"><i class="bi bi-mortarboard-fill"></i> Öğrenci Detayları</h6>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.StudentNumber" class="form-control" placeholder="Örn: 2410000000" />
+                            <label asp-for="Input.StudentNumber">Okul Numarası</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input asp-for="Input.Department" class="form-control" placeholder="Örn: Bilgisayar Programcılığı" />
+                            <label asp-for="Input.Department">Bölüm Adı</label>
+                        </div>
+                    </div>
+
+                    <div id="adminFields" style="display: none;" class="bg-warning-subtle p-3 rounded-3 mb-3 border border-warning">
+                        <h6 class="text-dark fw-bold mb-3"><i class="bi bi-shield-lock-fill"></i> Yönetici Yetkilendirme</h6>
+                        <p class="small text-muted mb-2">Yönetici hesabı oluşturmak için özel yetkilendirme şifresini girmelisiniz.</p>
+                        <div class="form-floating mb-2">
+                            <input asp-for="Input.AdminCode" class="form-control" type="password" placeholder="Gizli Kod" />
+                            <label asp-for="Input.AdminCode">Admin Kayıt Kodu</label>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3 mt-2">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="isim@ornek.com" />
+                        <label asp-for="Input.Email">E-posta Adresi</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Şifre" />
+                        <label asp-for="Input.Password">Şifre</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Şifre (Tekrar)" />
+                        <label asp-for="Input.ConfirmPassword">Şifreyi Doğrula</label>
+                    </div>
+                    
+                    <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary fw-bold rounded-pill shadow-sm">Kaydı Tamamla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var roleSelector = document.getElementById("roleSelector");
+            var studentFields = document.getElementById("studentFields");
+            var adminFields = document.getElementById("adminFields");
+
+            function toggleFields() {
+                // Hepsini gizle
+                studentFields.style.display = "none";
+                adminFields.style.display = "none";
+
+                // Seçime göre aç
+                if (roleSelector.value === "Öğrenci") {
+                    studentFields.style.display = "block";
+                } else if (roleSelector.value === "Yönetici") {
+                    adminFields.style.display = "block";
+                }
+            }
+
+            toggleFields();
+            roleSelector.addEventListener("change", toggleFields);
+        });
+    </script>
+}

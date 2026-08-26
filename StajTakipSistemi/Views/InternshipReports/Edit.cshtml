@@ -1,0 +1,100 @@
+﻿@model StajTakipSistemi.Models.InternshipReport
+
+@{
+    ViewData["Title"] = "Rapor Düzenleme ve Değerlendirme";
+}
+
+<div class="container py-4">
+    <div class="card shadow border-0 rounded-4 p-4">
+        <h3 class="fw-bold text-primary mb-4">@ViewData["Title"]</h3>
+        
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="FilePath" />
+            <input type="hidden" asp-for="StudentId" />
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Date" class="control-label fw-bold">Tarih</label>
+                        <input asp-for="Date" class="form-control" type="date" />
+                        <span asp-validation-for="Date" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Title" class="control-label fw-bold">Konu Başlığı</label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Content" class="control-label fw-bold">İçerik</label>
+                        <textarea asp-for="Content" class="form-control" rows="8"></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="UploadFile" class="control-label fw-bold">Ek Belge Güncelle</label>
+                        @if (!string.IsNullOrEmpty(Model.FilePath))
+                        {
+                            <div class="mb-2"><span class="badge bg-info text-dark">Mevcut: @Model.FilePath</span></div>
+                        }
+                        <input type="file" asp-for="UploadFile" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    @if (User.IsInRole("Akademisyen") || User.IsInRole("Yönetici"))
+                    {
+                        <div class="card border-primary mb-4 shadow-sm">
+                            <div class="card-header bg-primary text-white fw-bold">Akademik Değerlendirme</div>
+                            <div class="card-body bg-light">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Score" class="form-label fw-bold">Rapor Puanı (0-100)</label>
+                                    <input asp-for="Score" class="form-control form-control-lg border-primary" type="number" min="0" max="100" />
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label asp-for="Feedback" class="form-label fw-bold">Hoca Geri Bildirimi</label>
+                                    <textarea asp-for="Feedback" class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="IsApproved" class="form-check-input" type="checkbox" style="transform: scale(1.2);">
+                                    <label class="form-check-label ms-2 fw-bold">Raporu Resmi Olarak Onayla</label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="hidden" asp-for="IsApproved" />
+                        <input type="hidden" asp-for="Score" />
+                        <input type="hidden" asp-for="Feedback" />
+
+                        @if (Model.Score.HasValue || !string.IsNullOrEmpty(Model.Feedback))
+                        {
+                            <div class="card border-info shadow-sm">
+                                <div class="card-header bg-info text-white fw-bold">Akademik Notlar</div>
+                                <div class="card-body">
+                                    <h4 class="text-primary">Puan: @(Model.Score ?? 0) / 100</h4>
+                                    <p><strong>Geri Bildirim:</strong> @(Model.Feedback ?? "Henüz değerlendirme yapılmadı.")</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow">Kaydet</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-lg rounded-pill">Listeye Dön</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
